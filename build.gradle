@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id "edu.wpi.first.GradleRIO" version "2025.3.2"
+}
+
+group 'frc.robot'
+version '2026.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'edu.wpi.first.wpilibj:wpilibj-java:2025.+'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.5.0' 
+}
+
+test {
+    useJUnitPlatform() 
+    testLogging {
+        events "passed", "skipped", "failed" 
+    }
+}
