@@ -13,7 +13,7 @@ import java.util.List;
 public class PropertiesHttpService implements ReconfigurableConfig {
 
     // Add math for us
-    public static int PORT = 8081;
+    public static int PORT = 7426;
     private static HttpServer server = null ;
     static List<String> javaStaticFields = new ArrayList<String>() ;
 

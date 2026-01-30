@@ -33,7 +33,7 @@ public class PropertiesHandler implements HttpHandler {
         }
     }
 
-    private String getClassNameFromQuery(String query, String defaultClassName) {
+    String getClassNameFromQuery(String query, String defaultClassName) {
         String className = defaultClassName ;
 
         if (query != null) {
@@ -52,7 +52,7 @@ public class PropertiesHandler implements HttpHandler {
         return defaultClassName;
     }
 
-    private void handleGetRequest(HttpExchange exchange) throws IOException {
+    void handleGetRequest(HttpExchange exchange) throws IOException {
         String query = exchange.getRequestURI().getQuery();
         String className = getClassNameFromQuery(query, defaultClassName);
 
@@ -72,7 +72,7 @@ public class PropertiesHandler implements HttpHandler {
     }
 
     @SuppressWarnings("rawtypes")
-    private String buildHtmlForm(Class<?> clazz) {
+    String buildHtmlForm(Class<?> clazz) {
         StringBuilder html = new StringBuilder();
         printHeader(clazz, html);
 
@@ -99,7 +99,7 @@ public class PropertiesHandler implements HttpHandler {
         return html.toString();
     }
 
-    private void printHeader(Class<?> clazz, StringBuilder html) {
+    void printHeader(Class<?> clazz, StringBuilder html) {
         html.append("<html><script>\n") 
             .append("  function solveMath(iconElement) {\n").append(
                     "    const input = iconElement.parentNode.firstElementChild;\n").append(
@@ -133,7 +133,7 @@ public class PropertiesHandler implements HttpHandler {
     }
 
 
-    private void printFooter(StringBuilder html) {
+    void printFooter(StringBuilder html) {
         html.append("</TABLE><button type='submit'>Save</button>");
         html.append("</form>");
         html.append("<pre>\n") ;
@@ -150,7 +150,7 @@ public class PropertiesHandler implements HttpHandler {
         .append("</script></html>");
     }
 
-    private void printField(StringBuilder html, String name, String value) {
+    void printField(StringBuilder html, String name, String value) {
         html.append("<TR><TD><label>").append(name).append(": </label></TD>");
         html.append("<TD><DIV><input type='text' class=\"math-input\"  name='").append(name);
         html.append("' value='").append(value).append("'/>") ;
@@ -159,7 +159,7 @@ public class PropertiesHandler implements HttpHandler {
     }
 
     @SuppressWarnings("rawtypes")      
-    private StringBuilder logField(String name, String value, Class fieldType){
+    StringBuilder logField(String name, String value, Class fieldType){
         StringBuilder sb = new StringBuilder("public static ");
         sb.append(fieldType.getName()).append(" ");
         sb.append(name).append(" = ");
@@ -168,7 +168,7 @@ public class PropertiesHandler implements HttpHandler {
     }
 
     @SuppressWarnings("rawtypes")
-    private boolean isEditableType(Class fieldType) {
+    boolean isEditableType(Class fieldType) {
        if(fieldType == int.class){
         return true ;
        }
@@ -188,7 +188,7 @@ public class PropertiesHandler implements HttpHandler {
     }
 
     @SuppressWarnings("resource")
-    private void handlePostRequest(HttpExchange exchange) throws IOException {
+    void handlePostRequest(HttpExchange exchange) throws IOException {
         InputStream inputStream = exchange.getRequestBody();
         String body = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
                 .lines()
@@ -223,7 +223,7 @@ public class PropertiesHandler implements HttpHandler {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private String updateConfigFromFormData(String body) throws Exception, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+    String updateConfigFromFormData(String body) throws Exception, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
         String className = "";
         Map<String, String> formData = Arrays.stream(body.split("&"))
             .map(pair -> pair.split("=", 2))
@@ -262,15 +262,15 @@ public class PropertiesHandler implements HttpHandler {
         return className ;
     }
 
-    private String decode(String value) {
+    String decode(String value) {
         return java.net.URLDecoder.decode(value, StandardCharsets.UTF_8);
     }
 
-    public String getDefaultClassName() {
+    String getDefaultClassName() {
         return defaultClassName;
     }
 
-    public void setDefaultClassName(String defaultClassName) {
+    void setDefaultClassName(String defaultClassName) {
         this.defaultClassName = defaultClassName;
     }
 }

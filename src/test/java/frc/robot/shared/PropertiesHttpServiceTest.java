@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
@@ -28,7 +30,9 @@ class PropertiesHttpServiceTest {
     void testHandlePostRequest() throws Exception {
         // Mocking the HttpExchange
         when(exchange.getRequestMethod()).thenReturn("POST");
-        String requestBody = "className=frc.robot.shared.TestConfig&key2=value2";
+        assertNotEquals(999, TestConfig.INT_VAL);
+
+        String requestBody = "className=frc.robot.shared.TestConfig&INT_VAL=999";
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(requestBody.getBytes(StandardCharsets.UTF_8)));
         OutputStream os = new ByteArrayOutputStream();
         when(exchange.getResponseBody()).thenReturn(os);
@@ -42,6 +46,8 @@ class PropertiesHttpServiceTest {
         verify(exchange).sendResponseHeaders(200, os.toString().getBytes(StandardCharsets.UTF_8).length);
         String response = os.toString();
         assertEquals(true, response.contains("Configuration updated successfully!"));
+        assertEquals(999, TestConfig.INT_VAL);
+        assertEquals("2 times", TestConfig.getReconfigureTimes());
     }
 
     @Test
