@@ -1,22 +1,26 @@
 package frc.robot.shared;
 
-import com.sun.net.httpserver.HttpExchange;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.sun.net.httpserver.HttpExchange;
 
 class PropertiesHttpServiceTest {
 
-    private PropertiesHttpService.PropertiesHandler propertiesHandler;
+    private PropertiesHandler propertiesHandler;
     private HttpExchange exchange;
 
     @BeforeEach
     void setUp() {
-        propertiesHandler = new PropertiesHttpService.PropertiesHandler();
+        propertiesHandler = new PropertiesHandler();
         exchange = mock(HttpExchange.class);
     }
 

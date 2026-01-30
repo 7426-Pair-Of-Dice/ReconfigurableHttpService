@@ -22,21 +22,3 @@ test {
         events "passed", "skipped", "failed" 
     }
 }
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            name = "github"
-            url = uri("https://maven.pkg.github.com/7426-Pair-Of-Dice/ReconfigurableHttpService")
-            credentials {
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-}
