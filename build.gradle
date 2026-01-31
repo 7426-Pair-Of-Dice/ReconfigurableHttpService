@@ -1,10 +1,15 @@
 plugins {
     id 'java'
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
+    id "co.uzzu.dotenv.gradle" version "4.0.0"
 }
 
 group 'frc.robot'
 version '2026.1-SNAPSHOT'
+
+// dotenv {
+//   envFile='.env'
+// }
 
 repositories {
     mavenCentral()
@@ -30,6 +35,7 @@ publishing {
           maven {
               name = "GitHubPackages"
               url = "https://maven.pkg.github.com/<organization/username>/<repository name>"
+              
               credentials {
                   username = System.getenv("SECRET_USERNAME")
                   password = System.getenv("SECRET_PASSWORD")
