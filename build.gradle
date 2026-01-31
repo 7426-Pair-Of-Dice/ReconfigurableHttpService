@@ -23,3 +23,26 @@ test {
         events "passed", "skipped", "failed" 
     }
 }
+apply plugin: 'maven-publish'
+    
+publishing {
+      repositories {
+          maven {
+              name = "GitHubPackages"
+              url = "https://maven.pkg.github.com/<organization/username>/<repository name>"
+              credentials {
+                  username = System.getenv("SECRET_USERNAME")
+                  password = System.getenv("SECRET_PASSWORD")
+              }
+          }
+      }
+
+      publications {
+          gpr(MavenPublication) {
+              from components.java
+              groupId = project.group
+              artifactId = project.name
+              version = project.version
+          }
+      }
+  }
