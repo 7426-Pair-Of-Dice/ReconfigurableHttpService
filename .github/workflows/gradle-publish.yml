@@ -43,5 +43,8 @@ jobs:
     - name: Making Gradle Jar
       run: gradle jar
 
+    - name: Publishing jar
+      run: gradle publish
+
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
