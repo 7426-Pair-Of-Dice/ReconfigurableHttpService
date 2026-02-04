@@ -46,7 +46,7 @@ jobs:
     - name: Publishing jar
       run: gradle publish
       env:
-        SECRET_USERNAME: ${{ secrets.RECONFIG_USERNAME }}
+        SECRET_USERNAME: ${{ github.actor }}
         SECRET_PASSWORD: ${{ secrets.RECONFIG_ACCESS_TOKEN }}
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
