@@ -43,6 +43,10 @@ jobs:
     - name: Making Gradle Jar
       run: gradle jar
 
+    - name: Print
+      run: echo "Printing build artifacts ${{github.actor}}"
+
+
     - name: Publishing jar
       run: gradle publish
       env:
