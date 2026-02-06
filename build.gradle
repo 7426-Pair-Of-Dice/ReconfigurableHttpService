@@ -3,8 +3,15 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
 }
 
-group 'frc.robot'
-version '2026.1-SNAPSHOT'
+
+group 'frc.robot.pod7426'
+version '2026.2.0'
+
+
+
+// dotenv {
+//   envFile='.env'
+// }
 
 repositories {
     mavenCentral()
@@ -14,6 +21,7 @@ dependencies {
     implementation 'edu.wpi.first.wpilibj:wpilibj-java:2025.+'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.mockito:mockito-core:5.5.0' 
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 test {
@@ -22,3 +30,26 @@ test {
         events "passed", "skipped", "failed" 
     }
 }
+apply plugin: 'maven-publish'
+    
+publishing {
+      repositories {
+          maven {
+              name = "GitHubPackages"
+              url = "https://maven.pkg.github.com/7426-Pair-Of-Dice/ReconfigurableHttpService"             
+              credentials {
+                  username = System.getenv("SECRET_USERNAME")
+                  password = System.getenv("SECRET_PASSWORD")
+              }
+          }
+      }
+
+      publications {
+          maven(MavenPublication) {
+              from components.java
+              groupId = project.group
+              artifactId = 'reconfigurable-http-service'
+              version = project.version
+          }
+      }
+  }
