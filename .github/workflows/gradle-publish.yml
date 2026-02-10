@@ -9,7 +9,7 @@ name: Gradle Package
 
 on:
   push:
-        branches: [tyler's-workflow]
+        branches: [main]
 
 jobs:
   build:
