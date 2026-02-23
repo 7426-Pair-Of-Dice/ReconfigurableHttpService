@@ -1,13 +1,10 @@
 plugins {
-    id 'java'
+    id 'java-library' 
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
 }
 
-
 group 'frc.robot.pod7426'
-version '2026.2.21'
-
-
+version '2026.2.23'
 
 // dotenv {
 //   envFile='.env'
@@ -22,8 +19,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.mockito:mockito-core:5.5.0' 
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-    implementation 'io.github.classgraph:classgraph:4.8.165'
-
+    api 'io.github.classgraph:classgraph:4.8.165' 
 }
 
 test {
@@ -32,26 +28,27 @@ test {
         events "passed", "skipped", "failed" 
     }
 }
-apply plugin: 'maven-publish'
-    
-publishing {
-      repositories {
-          maven {
-              name = "GitHubPackages"
-              url = "https://maven.pkg.github.com/7426-Pair-Of-Dice/ReconfigurableHttpService"             
-              credentials {
-                  username = System.getenv("SECRET_USERNAME")
-                  password = System.getenv("SECRET_PASSWORD")
-              }
-          }
-      }
 
-      publications {
-          maven(MavenPublication) {
-              from components.java
-              groupId = project.group
-              artifactId = 'reconfigurable-http-service'
-              version = project.version
-          }
-      }
-  }
+apply plugin: 'maven-publish'
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/7426-Pair-Of-Dice/ReconfigurableHttpService"             
+            credentials {
+                username = System.getenv("SECRET_USERNAME")
+                password = System.getenv("SECRET_PASSWORD")
+            }
+        }
+    }
+
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            groupId = project.group
+            artifactId = 'reconfigurable-http-service'
+            version = project.version
+        }
+    }
+}

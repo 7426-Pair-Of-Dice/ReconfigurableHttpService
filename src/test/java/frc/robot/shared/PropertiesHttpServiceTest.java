@@ -15,10 +15,11 @@ import static org.mockito.Mockito.when;
 
 import com.sun.net.httpserver.HttpExchange;
 
-class PropertiesHttpServiceTest {
+class PropertiesHttpServiceTest implements ReconfigurableConfig{
 
     private PropertiesHandler propertiesHandler;
     private HttpExchange exchange;
+    public static int TEST = 0 ;
 
     @BeforeEach
     void setUp() {
@@ -60,5 +61,10 @@ class PropertiesHttpServiceTest {
 
         // Verifying the response headers
         verify(exchange).sendResponseHeaders(405, -1); // Method Not Allowed
+    }
+
+    @Override
+    public void reconfigure() {
+        // TODO Auto-generated method stub
     }
 }

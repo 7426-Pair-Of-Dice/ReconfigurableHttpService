@@ -8,23 +8,28 @@ import static org.mockito.Mockito.*;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.sun.net.httpserver.HttpExchange;
 
-class PropertiesHandlerTest {
+class PropertiesHandlerTest implements ReconfigurableConfig {
+
+     // Sample config class for testing
 
     private PropertiesHandler handler;
+    public static int TEST = 1 ;
 
     @BeforeEach
     void setUp() {
         handler = new PropertiesHandler();
         PropertiesHttpService.javaStaticFields.clear();
-        ReconfigurableConfig.addReconfigs(Arrays.asList(TestConfig.class));
+        Set<Class<?>> testClasses = new HashSet<>();
+        testClasses.add(TestConfig.class);
+        ReconfigurableConfig.addReconfigs(testClasses);
         TestConfig.setTimes(0);
     }
 
@@ -233,4 +238,12 @@ class PropertiesHandlerTest {
 
         verify(exchange).sendResponseHeaders(405, -1);
     }
+
+    @Override
+    public void reconfigure() {
+        Set<Class<?>> configs = new HashSet<>();
+        configs.add(TestConfig.class);
+        ReconfigurableConfig.addReconfigs(configs);
+    }
+
 }

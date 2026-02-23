@@ -1,8 +1,9 @@
 package frc.robot.shared;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.ServiceLoader;
+import java.util.Set;
+
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
@@ -10,13 +11,13 @@ import io.github.classgraph.ScanResult;
 public interface ReconfigurableConfig {
     public abstract void reconfigure()  ;
 
-    public static List<Class<?>> RECONFIGS = new ArrayList<>();
+    public static Set<Class<?>> RECONFIGS = new HashSet<>();
 
-    public static void addReconfigs(List<Class<?>> reconfigClasses) {
+    public static void addReconfigs(Set<Class<?>> reconfigClasses) {
         RECONFIGS.addAll(reconfigClasses) ;
     }
     
-    public static List<Class<?>> findReconfigurableConfigs() {
+    public static Set<Class<?>> findReconfigurableConfigs() {
         findReconfigurableClasses() ;
         return RECONFIGS;
     }

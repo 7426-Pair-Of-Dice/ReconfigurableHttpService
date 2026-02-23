@@ -9,8 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -120,7 +120,7 @@ public class PropertiesHandler implements HttpHandler {
         html.append("<form method='POST' id=\"mathForm\">");
         html.append("<h1><INPUT NAME='className' VALUE='").append(clazz.getName());
         html.append("' size='").append(clazz.getName().length()).append("'></h1>");
-        List<Class<?>> reconfigurableConfigs = ReconfigurableConfig.findReconfigurableConfigs();
+        Set<Class<?>> reconfigurableConfigs = ReconfigurableConfig.findReconfigurableConfigs();
         html.append("<h2>Reconfigurable Configurations</h2>");
         html.append("<ul>");
         for (Class<?> configClass : reconfigurableConfigs) {

@@ -1,5 +1,6 @@
 package frc.robot.shared;
 
+import java.io.IOException;
 
 public class TestConfig implements ReconfigurableConfig {
 
@@ -35,6 +36,21 @@ public class TestConfig implements ReconfigurableConfig {
     @Override
     public void reconfigure() {
         reconfigureTimes = (++times) + " times" ;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("INT_VAL: " + INT_VAL);
+        System.out.println("DOUBLE_VAL: " + DOUBLE_VAL);
+        System.out.println("STRING_VAL: " + STRING_VAL);
+        System.out.println("FLOAT_VAL: " + FLOAT_VAL);
+        System.out.println("BOOL_VAL: " + BOOL_VAL);
+        try {
+            PropertiesHttpService.startService();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+
     }
     
 }
