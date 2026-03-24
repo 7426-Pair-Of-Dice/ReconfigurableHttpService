@@ -1,7 +1,6 @@
 package frc.robot.shared;
 
 import java.util.HashSet;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import io.github.classgraph.ClassGraph;
@@ -11,7 +10,7 @@ import io.github.classgraph.ScanResult;
 public interface ReconfigurableConfig {
     public abstract void reconfigure()  ;
 
-    public static Set<Class<?>> RECONFIGS = new HashSet<>();
+    static Set<Class<?>> RECONFIGS = new HashSet<>();
 
     public static void addReconfigs(Set<Class<?>> reconfigClasses) {
         RECONFIGS.addAll(reconfigClasses) ;
@@ -33,22 +32,6 @@ public interface ReconfigurableConfig {
 
     }
 
-     // Static method to populate RECONFIGS
-    public static void findReconfigurableClassesOLD() {
-        try {
-            // Use ServiceLoader to find all implementations of ReconfigurableConfig
-            ServiceLoader<ReconfigurableConfig> loader = ServiceLoader.load(ReconfigurableConfig.class);
-            for (ReconfigurableConfig instance : loader) {
-                Class<? extends ReconfigurableConfig> clazz = instance.getClass();
-                if (!RECONFIGS.contains(clazz)) {
-                    RECONFIGS.add(clazz);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     static void findReconfigurableClasses() {
         try (ScanResult scanResult = new ClassGraph()
                 .enableClassInfo()
@@ -56,10 +39,8 @@ public interface ReconfigurableConfig {
                 .scan()) {
 
             for (ClassInfo classInfo : scanResult.getClassesImplementing(ReconfigurableConfig.class.getName())) {
-
                 Class<? extends ReconfigurableConfig> clazz = classInfo.loadClass(ReconfigurableConfig.class);
-
-                RECONFIGS.add(clazz); // Prefer a Set to avoid duplicates
+                RECONFIGS.add(clazz); 
             }
 
         } catch (Exception e) {

@@ -1,10 +1,11 @@
 plugins {
     id 'java-library' 
-    id "edu.wpi.first.GradleRIO" version "2025.3.2"
+    id 'maven-publish'
+    id 'org.hidetake.ssh' version '2.11.2' 
 }
 
 group 'frc.robot.pod7426'
-version '2026.2.23'
+version '2026.02.24'
 
 // dotenv {
 //   envFile='.env'
@@ -40,6 +41,11 @@ publishing {
                 password = System.getenv("SECRET_PASSWORD")
             }
         }
+
+        maven {
+            name = "LocalRepo"
+            url = layout.buildDirectory.dir("repo")
+        }
     }
 
     publications {
@@ -50,4 +56,48 @@ publishing {
             version = project.version
         }
     }
+
+    repositories {
+        maven {
+            name = "InternalRepo"
+            url = layout.buildDirectory.dir("m2")
+        }
+    }
+}
+
+
+ssh {
+    // Define the remote host and authentication
+    remotes {
+        webServer {
+            host = System.getenv("POD7426_HOSTNAME")
+            user = System.getenv("POD7426_USERNAME")
+            identity = file("${System.properties['user.home']}/.ssh/id_rsa")
+            knownHosts = allowAnyHosts
+
+        }
+    }
+}
+
+
+tasks.register('publishToWebsite') {
+    description = 'Publishes artifacts locally then syncs to the remote website via SSH.'
+    group = 'publishing'
+    dependsOn 'publish' 
+    doLast {
+        ssh.run {
+            session(ssh.remotes.webServer) {
+                println "Creating remote directory..."
+                execute "mkdir -p /var/www/nevadascientific.com/pod7426/"
+                println "Uploading repository files from build/m2..."
+                put from: layout.buildDirectory.dir("m2").get().asFile, 
+                    into: '/var/www/nevadascientific.com/pod7426/'
+            }
+        }
+        println "Deployment to Nevada Scientific complete."
+    }
+}
+
+tasks.named('publish') {
+    finalizedBy tasks.named('publishToWebsite')
 }
