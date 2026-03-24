@@ -14,6 +14,7 @@ public class PropertiesHttpService implements ReconfigurableConfig {
 
     // Add math for us
     public static int PORT = 7426;
+    public static String TEST = "Hello World" ;
     private static HttpServer server = null ;
     static List<String> javaStaticFields = new ArrayList<String>() ;
 
@@ -33,8 +34,21 @@ public class PropertiesHttpService implements ReconfigurableConfig {
 
     public static void startService() throws IOException {
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        server.createContext("/", new PropertiesHandler());
+        // Serve all StaticHtmlProvider implementations
+        for (Class<?> providerClass : ClassScanner.findImplementations(StaticHtmlProvider.class)) {
+            try {
+                StaticHtmlProvider provider = (StaticHtmlProvider) providerClass.getDeclaredConstructor().newInstance();
+                server.createContext(provider.getContextPath() + "/", new StaticHtmlHandler(provider));
+            } catch (Exception e) {
+                Logger.error(e);
+            }
+        }
+        // Serve properties handler at /properties
+        PropertiesHandler propertiesHandler = new PropertiesHandler();
+        server.createContext(propertiesHandler.getContextPath(), propertiesHandler);
+
         server.setExecutor(null);
+
         printIps();
         server.start();
     }

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reconfigurable Config</title>
+    <style>
+        table { border-collapse: collapse; width: 60%; margin: 2em auto; }
+        th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+        th { background: #eee; }
+    input[type="text"] { width: auto; min-width: 0; max-width: 20ch; }
+    .math-input-row { display: flex; align-items: center; gap: 4px; }
+        button { margin: 1em; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center">Reconfigurable Config</h1>
+    <div style="text-align:center; margin-bottom: 1em;">
+        <label for="configSelector">Select Config:&nbsp;</label>
+        <select id="configSelector"></select>
+    </div>
+    <table id="propertiesTable">
+        <thead>
+            <tr><th>Name</th><th>Value</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div style="text-align:center">
+        <button onclick="saveProperties()">Save</button>
+        <span id="status"></span>
+    </div>
+    <pre id="staticFields" style="margin:2em auto; width:60%; background:#f8f8f8; border:1px solid #ccc; padding:1em;"></pre>
+    <script>
+    // Math evaluation logic from PropertiesHandler.printHeader
+    function solveMath(iconElement) {
+        const input = iconElement.parentNode.firstElementChild;
+        evaluateInput(input);
+    }
+    function evaluateInput(input) {
+        const expression = input.value;
+        try {
+            const result = Function('"use strict"; return (' + expression + ')')();
+            input.value = result;
+        } catch (err) {
+            // Invalid expressions are ignored
+        }
+    }
+
+    let properties = [];
+    let configs = [];
+    let selectedConfig = "frc.robot.shared.PropertiesHttpService";
+    const configsUrl = "/properties/configs";
+    function fetchConfigs() {
+        fetch(configsUrl)
+            .then(r => r.json())
+            .then(data => {
+                configs = data;
+                const selector = document.getElementById("configSelector");
+                selector.innerHTML = "";
+                configs.forEach(cfg => {
+                    const opt = document.createElement("option");
+                    opt.value = cfg.name;
+                    opt.textContent = cfg.name;
+                    selector.appendChild(opt);
+                });
+                selector.value = selectedConfig;
+            });
+    }
+    function getApiUrl() {
+        return `/properties?className=${encodeURIComponent(selectedConfig)}`;
+    }
+    function getStaticFieldsUrl() {
+        return `/properties/staticFields?className=${encodeURIComponent(selectedConfig)}`;
+    }
+    function fetchProperties() {
+        fetch(getApiUrl())
+            .then(r => r.json())
+            .then(data => {
+                properties = data;
+                renderTable();
+                fetchStaticFields();
+            });
+    }
+    function renderTable() {
+        const tbody = document.querySelector("#propertiesTable tbody");
+        tbody.innerHTML = "";
+        properties.forEach((prop, idx) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${prop.name}</td><td><div class='math-input-row'><input type='text' class='math-input' size='20' value='${prop.value}' data-idx='${idx}'/><span class='math-icon' style='cursor:pointer;' onclick='solveMath(this)'>🔢</span></div></td>`;
+            tbody.appendChild(row);
+        });
+    }
+    function fetchStaticFields() {
+        fetch(getStaticFieldsUrl())
+            .then(r => r.json())
+            .then(data => {
+                const pre = document.getElementById("staticFields");
+                pre.textContent = data.join("\n");
+            });
+    }
+    function saveProperties() {
+        // Run solveMath on all fields before saving
+        document.querySelectorAll("#propertiesTable .math-icon").forEach(icon => solveMath(icon));
+        document.querySelectorAll("#propertiesTable input").forEach(input => {
+            const idx = input.getAttribute("data-idx");
+            properties[idx].value = input.value;
+        });
+        fetch(getApiUrl(), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(properties)
+        })
+        .then(r => r.json())
+        .then(resp => {
+            document.getElementById("status").textContent = "Saved!";
+            setTimeout(() => document.getElementById("status").textContent = "", 2000);
+            fetchProperties();
+        });
+    }
+    document.getElementById("configSelector").addEventListener("change", function() {
+        selectedConfig = this.value;
+        fetchProperties();
+    });
+    fetchConfigs();
+    fetchProperties();
+    </script>
+</body>
+</html>
