@@ -2,6 +2,7 @@ package frc.robot.shared;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,28 +34,36 @@ class PropertiesHttpServiceTest implements ReconfigurableConfig{
         when(exchange.getRequestMethod()).thenReturn("POST");
         assertNotEquals(999, TestConfig.INT_VAL);
 
-        String requestBody = "className=frc.robot.shared.TestConfig&INT_VAL=999";
+        String requestBody = "[{\"name\":\"INT_VAL\",\"value\":\"999\"}]";
         when(exchange.getRequestBody()).thenReturn(new java.io.ByteArrayInputStream(requestBody.getBytes(StandardCharsets.UTF_8)));
         OutputStream os = new ByteArrayOutputStream();
         when(exchange.getResponseBody()).thenReturn(os);
         when(exchange.getResponseHeaders()).thenReturn(mock(com.sun.net.httpserver.Headers.class));
+        URI uri = mock(URI.class);
+        when(uri.getQuery()).thenReturn("className=" + TestConfig.class.getName());
+        when(uri.getPath()).thenReturn("/properties"); // mock getPath()
+        when(exchange.getRequestURI()).thenReturn(uri);
 
         // Calling the method
         propertiesHandler.handle(exchange);
 
         // Verifying the response headers and body
-        verify(exchange.getResponseHeaders()).set("Content-Type", "text/html; charset=UTF-8");
+        verify(exchange.getResponseHeaders()).set("Content-Type", "application/json; charset=UTF-8");
         verify(exchange).sendResponseHeaders(200, os.toString().getBytes(StandardCharsets.UTF_8).length);
         String response = os.toString();
-        assertEquals(true, response.contains("Configuration updated successfully!"));
+        assertEquals("{\"status\":\"ok\"}", response, "Response should indicate success, but was: " + response);
         assertEquals(999, TestConfig.INT_VAL);
-        assertEquals("2 times", TestConfig.getReconfigureTimes());
+        assertEquals("1 times", TestConfig.getReconfigureTimes());
     }
 
     @Test
     void testHandleUnsupportedMethod() throws Exception {
         // Mocking the HttpExchange
         when(exchange.getRequestMethod()).thenReturn("PUT");
+        URI uri = mock(URI.class);
+        when(uri.getQuery()).thenReturn("className=" + TestConfig.class.getName());
+        when(uri.getPath()).thenReturn("/properties"); // mock getPath()
+        when(exchange.getRequestURI()).thenReturn(uri);
 
         // Calling the method
         propertiesHandler.handle(exchange);

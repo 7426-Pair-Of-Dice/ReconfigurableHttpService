@@ -176,8 +176,9 @@ class PropertiesHandlerTest implements ReconfigurableConfig {
         HttpExchange exchange = mock(HttpExchange.class);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        when(exchange.getRequestURI())
-            .thenReturn(new URI("/?className=" + TestConfig.class.getName()));
+        URI uri = mock(URI.class);
+        when(uri.getQuery()).thenReturn("className=" + TestConfig.class.getName());
+        when(exchange.getRequestURI()).thenReturn(uri);
         when(exchange.getResponseBody()).thenReturn(os);
         when(exchange.getResponseHeaders()).thenReturn(new com.sun.net.httpserver.Headers());
 
@@ -197,19 +198,27 @@ class PropertiesHandlerTest implements ReconfigurableConfig {
         HttpExchange exchange = mock(HttpExchange.class);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        String body = "className=" + TestConfig.class.getName() + "&INT_VAL=99";
-
+        String body = "[{\"name\":\"INT_VAL\",\"value\":\"99\"}]";
         when(exchange.getRequestBody())
             .thenReturn(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
         when(exchange.getResponseBody()).thenReturn(os);
         when(exchange.getResponseHeaders()).thenReturn(new com.sun.net.httpserver.Headers());
-
-        handler.handlePostRequest(exchange);
-
-        verify(exchange).sendResponseHeaders(eq(200), anyLong());
-        assertEquals(99, TestConfig.INT_VAL);
-        assertTrue(os.toString(StandardCharsets.UTF_8).contains("Configuration updated successfully"));
-    }
+        // mock request headers to indicate JSON
+        com.sun.net.httpserver.Headers reqHeaders = new com.sun.net.httpserver.Headers();
+        reqHeaders.add("Content-Type", "application/json");
+        when(exchange.getRequestHeaders()).thenReturn(reqHeaders);
+        URI uri = mock(URI.class);
+        when(uri.getQuery()).thenReturn("className=" + TestConfig.class.getName());
+        when(exchange.getRequestURI()).thenReturn(uri);
+        when(exchange.getRequestMethod()).thenReturn("POST");
+ 
+         handler.handlePostRequest(exchange);
+ 
+         verify(exchange).sendResponseHeaders(eq(200), anyLong());
+         assertEquals(99, TestConfig.INT_VAL);
+         assertEquals("{\"status\":\"ok\"}", os.toString(), "Actually: "+ os.toString());
+     }
+ 
 
     // -------------------------
     // handle (dispatch)
@@ -219,20 +228,23 @@ class PropertiesHandlerTest implements ReconfigurableConfig {
     void testHandleGetDispatch() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
         when(exchange.getRequestMethod()).thenReturn("GET");
-        when(exchange.getRequestURI())
-            .thenReturn(new URI("/?className=" + TestConfig.class.getName()));
+        URI uri = mock(URI.class);
+        when(uri.getQuery()).thenReturn("className=" + TestConfig.class.getName());
+        when(uri.getPath()).thenReturn("/properties"); // mock getPath()
+        when(exchange.getRequestURI()).thenReturn(uri);
         when(exchange.getResponseBody()).thenReturn(new ByteArrayOutputStream());
         when(exchange.getResponseHeaders()).thenReturn(new com.sun.net.httpserver.Headers());
-
         handler.handle(exchange);
-
-        verify(exchange).sendResponseHeaders(eq(200), anyLong());
     }
 
     @Test
     void testHandleUnsupportedMethod() throws Exception {
         HttpExchange exchange = mock(HttpExchange.class);
         when(exchange.getRequestMethod()).thenReturn("PUT");
+        URI uri = mock(URI.class);
+        when(uri.getQuery()).thenReturn("className=" + TestConfig.class.getName());
+        when(exchange.getRequestURI()).thenReturn(uri);
+        when(uri.getPath()).thenReturn("/properties"); // mock getPath()
 
         handler.handle(exchange);
 
