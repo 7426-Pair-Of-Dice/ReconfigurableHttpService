@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'frc.robot.pod7426'
-version '2026.02.24'
+version '2026.03.25'
 
 // dotenv {
 //   envFile='.env'
