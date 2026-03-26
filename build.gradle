@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'frc.robot.pod7426'
-version '2026.03.25'
+version '2026.03.26'
 
 // dotenv {
 //   envFile='.env'
@@ -26,6 +26,14 @@ test {
     useJUnitPlatform() 
     testLogging {
         events "passed", "skipped", "failed" 
+    }
+}
+
+// Copy any HTML files from src/main/java into the jar alongside class files
+tasks.named('processResources') {
+    from('src/main/java') {
+        include '**/*.html'
+        // Preserve directory structure relative to src/main/java
     }
 }
 
